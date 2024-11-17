@@ -19,3 +19,7 @@ yarn-error.log
 
 expo-env.d.ts
 # @end expo-cli
+
+# native folders
+android
+ios
