@@ -1,55 +1,49 @@
 /* eslint-disable react/no-unstable-nested-components */
-import { Link, Tabs } from "expo-router";
-import React from "react";
+import { Feather } from '@expo/vector-icons';
+import { Tabs } from 'expo-router';
+import { Category, Heart, Home } from 'iconsax-react-native';
+import React from 'react';
 
-import { Pressable, Text } from "@/components/ui";
-import {
-	Feed as FeedIcon,
-	Settings as SettingsIcon,
-	Style as StyleIcon,
-} from "@/components/ui/icons";
+import { colors } from '@/components/ui';
+import { TabBar } from '@/components/ui/tab-bar';
 
 export default function TabLayout() {
-	return (
-		<Tabs>
-			<Tabs.Screen
-				name="index"
-				options={{
-					title: "Feed",
-					tabBarIcon: ({ color }) => <FeedIcon color={color} />,
-					headerRight: () => <CreateNewPostLink />,
-					tabBarButtonTestID: "feed-tab",
-				}}
-			/>
-
-			<Tabs.Screen
-				name="style"
-				options={{
-					title: "Style",
-					headerShown: false,
-					tabBarIcon: ({ color }) => <StyleIcon color={color} />,
-					tabBarButtonTestID: "style-tab",
-				}}
-			/>
-			<Tabs.Screen
-				name="settings"
-				options={{
-					title: "Settings",
-					headerShown: false,
-					tabBarIcon: ({ color }) => <SettingsIcon color={color} />,
-					tabBarButtonTestID: "settings-tab",
-				}}
-			/>
-		</Tabs>
-	);
+  return (
+    <Tabs
+      screenOptions={{
+        animation: 'shift',
+        tabBarActiveTintColor: colors.white,
+        tabBarInactiveTintColor: '#BEBEBE',
+      }}
+      tabBar={(props) => <TabBar {...props} />}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => <Home color={color} variant="Bold" />,
+        }}
+      />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          tabBarIcon: ({ color }) => <Category color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="favorites"
+        options={{
+          tabBarIcon: ({ color }) => <Heart color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="downloads"
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Feather size={24} name="download" color={color} />
+          ),
+        }}
+      />
+    </Tabs>
+  );
 }
-
-const CreateNewPostLink = () => {
-	return (
-		<Link href="/feed/add-post" asChild>
-			<Pressable>
-				<Text className="px-3 text-primary-300">Create</Text>
-			</Pressable>
-		</Link>
-	);
-};

@@ -1,6 +1,8 @@
 import type { AxiosError } from 'axios';
+import { type ClassValue, clsx } from 'clsx';
 import { Dimensions, Platform } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
+import { twMerge } from 'tailwind-merge';
 
 export const IS_IOS = Platform.OS === 'ios';
 const { width, height } = Dimensions.get('screen');
@@ -22,7 +24,7 @@ export const showError = (error: AxiosError) => {
   });
 };
 
-export const showErrorMessage = (message: string = 'Something went wrong ') => {
+export const showErrorMessage = (message = 'Something went wrong ') => {
   showMessage({
     message,
     type: 'danger',
@@ -53,3 +55,7 @@ export const extractError = (data: unknown): string => {
   }
   return 'Something went wrong ';
 };
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
