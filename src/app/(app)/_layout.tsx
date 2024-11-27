@@ -13,7 +13,7 @@ export default function TabLayout() {
       screenOptions={{
         animation: 'shift',
         tabBarActiveTintColor: colors.white,
-        tabBarInactiveTintColor: '#BEBEBE',
+        tabBarInactiveTintColor: colors.gray,
       }}
       tabBar={(props) => <TabBar {...props} />}
     >

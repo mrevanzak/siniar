@@ -2,8 +2,7 @@ module.exports = {
   white: '#ffffff',
   black: '#000000',
   'primary-red': '#E83536',
-  gray: '#0F0F0F',
-  'light-gray': '#212121',
+  gray: '#BEBEBE',
   charcoal: {
     50: '#F2F2F2',
     100: '#E5E5E5',
