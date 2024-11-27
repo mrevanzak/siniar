@@ -7,17 +7,24 @@ import {
   type ParamListBase,
   useTheme,
 } from '@react-navigation/native';
-import { useCallback, useEffect, useState } from 'react';
+import {
+  type Dispatch,
+  type SetStateAction,
+  useCallback,
+  useState,
+} from 'react';
 import { Dimensions, type LayoutChangeEvent, View } from 'react-native';
 import Animated, {
+  clamp,
   FadeInRight,
   FadeOutLeft,
   LinearTransition,
+  type SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { match, P } from 'ts-pattern';
+import { match,P } from 'ts-pattern';
 
 import { capitalize } from '@/lib';
 
@@ -32,7 +39,8 @@ type TabBarItemProps = {
   options: BottomTabNavigationOptions;
   state: BottomTabBarProps['state'];
   navigation: BottomTabBarProps['navigation'];
-  setActiveItemWidth: (width: number) => void;
+  activeItemWidth: SharedValue<number>;
+  setPositionX: Dispatch<SetStateAction<number[]>>;
 };
 
 // eslint-disable-next-line max-lines-per-function
@@ -42,8 +50,11 @@ function TabBarItem({
   index,
   state,
   navigation,
-  setActiveItemWidth,
+  activeItemWidth,
+  setPositionX,
 }: TabBarItemProps) {
+  const animated = useSharedValue(false);
+
   const { colors } = useTheme();
 
   const Label =
@@ -78,14 +89,25 @@ function TabBarItem({
 
   const Icon = options.tabBarIcon;
 
-  /** TODO!: need to change how we get the width of the active item */
-  const onLayout = useCallback(
+  const onInnerLayout = useCallback(
     (e: LayoutChangeEvent) => {
       if (isFocused) {
-        setActiveItemWidth(e.nativeEvent.layout.width);
+        activeItemWidth.set(e.nativeEvent.layout.width + MARGIN * 2);
       }
     },
-    [isFocused, setActiveItemWidth],
+    [activeItemWidth, isFocused],
+  );
+
+  const onLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      const x = e.nativeEvent.layout.x;
+      setPositionX((prev) => {
+        const next = [...prev];
+        next[index] = x;
+        return next;
+      });
+    },
+    [index, setPositionX],
   );
 
   return (
@@ -100,8 +122,14 @@ function TabBarItem({
       onLayout={onLayout}
     >
       <Animated.View
-        layout={LinearTransition.springify().damping(80).stiffness(200)}
+        layout={LinearTransition.springify()
+          .damping(80)
+          .stiffness(200)
+          .withCallback(() => {
+            animated.value = true;
+          })}
         className="justify-center self-center"
+        onLayout={onInnerLayout}
       >
         <Animated.View className="flex-row items-center justify-center gap-2">
           {Icon && (
@@ -129,27 +157,30 @@ function TabBarItem({
 }
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
-  const [activeItemWidth, setActiveItemWidth] = useState(
-    SCREEN_WIDTH / state.routes.length,
+  const activeItemWidth = useSharedValue(SCREEN_WIDTH / state.routes.length);
+  const [positionX, setPositionX] = useState(
+    Array(state.routes.length).fill(0),
   );
-  const tabPositionX = useSharedValue(0);
 
   const backgroundStyle = useAnimatedStyle(() => {
     return {
       transform: [
         {
-          translateX: withTiming(tabPositionX.value, {
-            duration: 200,
-          }),
+          translateX: withTiming(
+            clamp(
+              positionX[state.index] - (state.index * MARGIN) / 3,
+              0,
+              SCREEN_WIDTH - activeItemWidth.value,
+            ),
+            {
+              duration: 200,
+            },
+          ),
         },
       ],
-      width: activeItemWidth,
+      width: withTiming(activeItemWidth.value),
     };
   });
-
-  useEffect(() => {
-    tabPositionX.value = state.index * activeItemWidth;
-  }, [activeItemWidth, state.index, tabPositionX]);
 
   return (
     <View
@@ -169,7 +200,8 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
           index={index}
           state={state}
           navigation={navigation}
-          setActiveItemWidth={setActiveItemWidth}
+          activeItemWidth={activeItemWidth}
+          setPositionX={setPositionX}
         />
       ))}
     </View>
