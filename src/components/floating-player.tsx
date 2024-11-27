@@ -1,6 +1,7 @@
 import { useAudioPlayer } from 'expo-audio';
 import { BlurView } from 'expo-blur';
 import { PauseCircle, PlayCircle } from 'iconsax-react-native';
+import { useColorScheme } from 'nativewind';
 import { useState } from 'react';
 
 import { useFeaturedPodcast } from '@/api/podcasts/use-featured-podcast';
@@ -10,6 +11,7 @@ import { colors, Image, Text, TouchableOpacity, useModal,View } from './ui';
 import { PressableScale } from './ui/pressable-scale';
 
 export function FloatingPlayer() {
+  const { colorScheme } = useColorScheme();
   const featuredPodcastQuery = useFeaturedPodcast();
 
   const data = featuredPodcastQuery.data?.collection[0];
@@ -34,6 +36,8 @@ export function FloatingPlayer() {
       <BlurView
         className="absolute inset-x-3 bottom-28 h-14 flex-row items-center justify-between overflow-hidden rounded-lg px-3"
         experimentalBlurMethod="dimezisBlurView"
+        tint="dark"
+        intensity={colorScheme === 'dark' ? 100 : 15}
       >
         <View className="flex-row items-center gap-4">
           <Image
@@ -46,9 +50,17 @@ export function FloatingPlayer() {
 
         <PressableScale onPress={onPlay}>
           {isPlaying ? (
-            <PauseCircle size="32" color={colors.gray} variant="Bold" />
+            <PauseCircle
+              size="32"
+              color={colorScheme === 'dark' ? colors.gray : colors['dark-gray']}
+              variant="Bold"
+            />
           ) : (
-            <PlayCircle size="32" color={colors.gray} variant="Bold" />
+            <PlayCircle
+              size="32"
+              color={colorScheme === 'dark' ? colors.gray : colors['dark-gray']}
+              variant="Bold"
+            />
           )}
         </PressableScale>
       </BlurView>
