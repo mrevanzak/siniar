@@ -19,6 +19,7 @@ export const Image = ({
     <NImage
       className={className}
       placeholder={placeholder}
+      transition={1000}
       style={style}
       {...props}
     />

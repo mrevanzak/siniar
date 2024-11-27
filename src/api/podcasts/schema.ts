@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const podcastSchema = z.object({
   updated_at: z.string(),
-  type: z.string(),
+  type: z.union([z.literal('full'), z.literal('trailer')]),
   token: z.string(),
   title: z.string(),
   status: z.string(),
@@ -14,7 +14,7 @@ const podcastSchema = z.object({
   }),
   scheduled_for: z.null(),
   published_at: z.string(),
-  number: z.null(),
+  number: z.number().nullable(),
   is_hidden: z.boolean(),
   image_url: z.string(),
   image_path: z.string(),
@@ -35,8 +35,16 @@ export const podcastsSchema = z.object({
   href: z.string(),
   pages: z.object({
     total: z.number(),
-    previous: z.null(),
-    next: z.null(),
+    previous: z
+      .object({
+        href: z.string().url(),
+      })
+      .nullable(),
+    next: z
+      .object({
+        href: z.string().url(),
+      })
+      .nullable(),
     limit: z.number(),
     current: z.number(),
   }),
