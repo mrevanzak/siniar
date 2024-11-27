@@ -41,6 +41,7 @@
     "e2e-test": "maestro test .maestro/ -e APP_ID=com.obytes.development"
   },
   "dependencies": {
+    "@expo-google-fonts/manrope": "^0.2.3",
     "@expo/metro-runtime": "^4.0.0",
     "@gorhom/bottom-sheet": "^5.0.5",
     "@hookform/resolvers": "^3.9.0",

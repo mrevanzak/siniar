@@ -9,7 +9,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        inter: ['Inter'],
+        manrope: ['Manrope_400Regular'],
       },
       colors,
     },

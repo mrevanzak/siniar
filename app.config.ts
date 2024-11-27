@@ -69,7 +69,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-font',
       {
-        fonts: ['./assets/fonts/Inter.ttf'],
+        fonts: [
+          'node_modules/@expo-google-fonts/manrope/Manrope_400Regular.ttf',
+        ],
       },
     ],
     'expo-localization',
