@@ -41,6 +41,7 @@ import { Path, Svg } from 'react-native-svg';
 import { Text } from './text';
 
 export type ModalProps = BottomSheetModalProps & {
+  headerClassName?: string;
   title?: string;
   hideCloseButton?: boolean;
 };
@@ -50,6 +51,7 @@ type ModalRef = React.ForwardedRef<BottomSheetModal>;
 type ModalHeaderProps = {
   title?: string;
   hideCloseButton?: boolean;
+  className?: string;
   dismiss: () => void;
 };
 
@@ -71,6 +73,7 @@ export const Modal = React.forwardRef(
       title,
       hideCloseButton = false,
       detached = false,
+      headerClassName,
       ...props
     }: ModalProps,
     ref: ModalRef,
@@ -93,9 +96,10 @@ export const Modal = React.forwardRef(
           title={title}
           dismiss={modal.dismiss}
           hideCloseButton={hideCloseButton}
+          className={headerClassName}
         />
       ),
-      [title, modal.dismiss, hideCloseButton],
+      [title, modal.dismiss, hideCloseButton, headerClassName],
     );
 
     return (
@@ -160,15 +164,17 @@ const getDetachedProps = (detached: boolean) => {
  */
 
 const ModalHeader = React.memo(
-  ({ title, dismiss, hideCloseButton }: ModalHeaderProps) => {
+  ({ title, dismiss, hideCloseButton, className }: ModalHeaderProps) => {
     return (
-      <View className="pt-safe">
+      <View className={className}>
         {hideCloseButton ? (
           <View className="h-1 w-6 self-center rounded-full bg-gray" />
         ) : (
-          <CloseButton close={dismiss} />
+          <>
+            <View className="bg-gray-400 dark:bg-gray-700 mb-8 mt-2 h-1 w-12 self-center rounded-lg" />
+            <CloseButton close={dismiss} />
+          </>
         )}
-
         {title && (
           <View className="flex-row px-2 py-4">
             <View className="flex-1">
@@ -187,7 +193,7 @@ const CloseButton = ({ close }: { close: () => void }) => {
   return (
     <Pressable
       onPress={close}
-      className="mr-3 size-[24px] items-center justify-center self-end"
+      className="absolute right-3 top-3 size-[24px] items-center justify-center "
       hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
       accessibilityLabel="close modal"
       accessibilityRole="button"

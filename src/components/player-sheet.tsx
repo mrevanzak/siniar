@@ -68,6 +68,7 @@ export const PlayerSheet = forwardRef<BottomSheetModal, PlayerSheetProps>(
         snapPoints={['100%']}
         backgroundComponent={(props) => <BlurView {...props} className="" />}
         style={{ paddingHorizontal: 20 }}
+        headerClassName="mt-safe"
         hideCloseButton
         title="Now Playing"
       >
