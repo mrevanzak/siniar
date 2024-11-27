@@ -80,15 +80,12 @@ const client = z.object({
 
   // ADD YOUR CLIENT ENV VARS HERE
   API_URL: z.string(),
-  VAR_NUMBER: z.number(),
-  VAR_BOOL: z.boolean(),
 });
 
 const buildTime = z.object({
   EXPO_ACCOUNT_OWNER: z.string(),
   EAS_PROJECT_ID: z.string(),
   // ADD YOUR BUILD TIME ENV VARS HERE
-  SECRET_KEY: z.string(),
 });
 
 /**
@@ -104,8 +101,6 @@ const _clientEnv = {
 
   // ADD YOUR ENV VARS HERE TOO
   API_URL: process.env.API_URL,
-  VAR_NUMBER: Number(process.env.VAR_NUMBER),
-  VAR_BOOL: process.env.VAR_BOOL === 'true',
 };
 
 /**
@@ -115,7 +110,6 @@ const _buildTimeEnv = {
   EXPO_ACCOUNT_OWNER,
   EAS_PROJECT_ID,
   // ADD YOUR ENV VARS HERE TOO
-  SECRET_KEY: process.env.SECRET_KEY,
 };
 
 /**
@@ -138,10 +132,10 @@ if (parsed.success === false) {
     parsed.error.flatten().fieldErrors,
 
     `\n❌ Missing variables in .env.${APP_ENV} file, Make sure all required variables are defined in the .env.${APP_ENV} file.`,
-    `\n💡 Tip: If you recently updated the .env.${APP_ENV} file and the error still persists, try restarting the server with the -c flag to clear the cache.`
+    `\n💡 Tip: If you recently updated the .env.${APP_ENV} file and the error still persists, try restarting the server with the -c flag to clear the cache.`,
   );
   throw new Error(
-    'Invalid environment variables, Check terminal for more details '
+    'Invalid environment variables, Check terminal for more details ',
   );
 }
 

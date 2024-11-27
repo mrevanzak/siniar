@@ -3,7 +3,7 @@ import '../../global.css';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import type { ReactNode } from 'react';
 import React from 'react';
@@ -31,9 +31,7 @@ SplashScreen.setOptions({
 export default function RootLayout() {
   return (
     <Providers>
-      <Stack>
-        <Stack.Screen name="(app)" options={{ headerShown: false }} />
-      </Stack>
+      <Slot />
     </Providers>
   );
 }

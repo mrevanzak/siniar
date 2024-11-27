@@ -13,6 +13,7 @@ import {
   useCallback,
   useState,
 } from 'react';
+import React from 'react';
 import { Dimensions, type LayoutChangeEvent, View } from 'react-native';
 import Animated, {
   clamp,
@@ -28,6 +29,7 @@ import { match,P } from 'ts-pattern';
 
 import { capitalize } from '@/lib';
 
+import { FloatingPlayer } from '../floating-player';
 import { PressableScale } from './pressable-scale';
 
 const MARGIN = 16;
@@ -183,27 +185,31 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   });
 
   return (
-    <View
-      className="mb-safe h-20 flex-row items-center justify-center"
-      style={{ marginHorizontal: MARGIN }}
-    >
-      <Animated.View
-        className="absolute inset-0 my-5 rounded-full bg-primary-red"
-        style={[backgroundStyle]}
-      />
-
-      {state.routes.map((route, index) => (
-        <TabBarItem
-          key={route.key}
-          options={descriptors[route.key].options}
-          route={route}
-          index={index}
-          state={state}
-          navigation={navigation}
-          activeItemWidth={activeItemWidth}
-          setPositionX={setPositionX}
+    <React.Fragment>
+      <View
+        className="mb-safe h-20 flex-row items-center justify-center"
+        style={{ marginHorizontal: MARGIN }}
+      >
+        <Animated.View
+          className="absolute inset-0 my-5 rounded-full bg-primary-red"
+          style={[backgroundStyle]}
         />
-      ))}
-    </View>
+
+        {state.routes.map((route, index) => (
+          <TabBarItem
+            key={route.key}
+            options={descriptors[route.key].options}
+            route={route}
+            index={index}
+            state={state}
+            navigation={navigation}
+            activeItemWidth={activeItemWidth}
+            setPositionX={setPositionX}
+          />
+        ))}
+      </View>
+
+      <FloatingPlayer />
+    </React.Fragment>
   );
 }
