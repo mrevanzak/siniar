@@ -29,7 +29,7 @@ export function FloatingPlayer() {
   useEffect(() => {
     if (!data) return;
 
-    TrackPlayer.add([
+    TrackPlayer.setQueue([
       {
         url: data.enclosure_url,
         title: data.title,

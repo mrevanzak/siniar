@@ -46,7 +46,7 @@ export function PodcastItem({
           </Skeleton>
         </View>
 
-        {!skeleton && <PlayButton isPlaying={isPlaying} />}
+        {!skeleton && <PlayButton isPlaying={isPlaying} selectedItem={item} />}
       </TouchableOpacity>
     </Skeleton.Group>
   );
