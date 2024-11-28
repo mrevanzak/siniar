@@ -21,6 +21,6 @@ export function usePodcasts(search: string) {
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage) =>
-      (lastPage.pages.current - 1) * lastPage.pages.limit,
+      lastPage.pages.current * lastPage.pages.limit,
   });
 }
