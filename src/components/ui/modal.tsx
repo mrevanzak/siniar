@@ -128,8 +128,8 @@ const CustomBackdrop = ({ style }: BottomSheetBackdropProps) => {
   return (
     <AnimatedPressable
       onPress={() => close()}
-      entering={FadeIn.duration(50)}
-      exiting={FadeOut.duration(20)}
+      entering={FadeIn.duration(100)}
+      exiting={FadeOut.duration(200)}
       style={[style, { backgroundColor: 'rgba(0, 0, 0, 0.4)' }]}
     />
   );
