@@ -9,8 +9,10 @@ export * from './image';
 export * from './input';
 export * from './list';
 export * from './modal';
+export * from './pressable-scale';
 export * from './progress-bar';
 export * from './select';
+export * from './skeleton';
 export * from './text';
 export * from './utils';
 

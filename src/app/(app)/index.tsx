@@ -1,15 +1,11 @@
 import { FlashList } from '@shopify/flash-list';
-import {
-  NotificationBing,
-  PlayCircle,
-  SearchNormal,
-} from 'iconsax-react-native';
-import { Skeleton } from 'moti/skeleton';
+import { NotificationBing, SearchNormal } from 'iconsax-react-native';
 import { useMemo } from 'react';
-import { ActivityIndicator, TextInput, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, TextInput } from 'react-native';
 import { useDebounceValue } from 'usehooks-ts';
 
 import { usePodcasts } from '@/api/podcasts/use-podcasts';
+import { PodcastItem } from '@/components/podcast-item';
 import { colors,Image, SafeAreaView, Text, View } from '@/components/ui';
 import { PressableScale } from '@/components/ui/pressable-scale';
 
@@ -76,18 +72,7 @@ export default function Home() {
             isLoading ? (
               <View>
                 {Array.from({ length: 4 }, (_, index) => (
-                  <Skeleton.Group key={index} show={isLoading}>
-                    <View className="flex-row gap-4 py-2">
-                      <Skeleton>
-                        <Image
-                          source="https://api.dicebear.com/9.x/lorelei/svg"
-                          className="size-16 rounded-lg"
-                        />
-                      </Skeleton>
-
-                      <Skeleton height={40} width="100%" />
-                    </View>
-                  </Skeleton.Group>
+                  <PodcastItem key={index} skeleton />
                 ))}
               </View>
             ) : (
@@ -96,25 +81,7 @@ export default function Home() {
               </Text>
             )
           }
-          renderItem={({ item }) => (
-            <TouchableOpacity className="flex-row items-center gap-4 py-2">
-              <Image source={item.image_url} className="size-16 rounded-lg" />
-
-              <View className="flex-1">
-                <Text className="text-sm font-semibold">{item.title}</Text>
-                <Text className="text-xs opacity-70">
-                  React Native Radio •{' '}
-                  {item.type === 'full'
-                    ? `E${item.number}`
-                    : item.type.toUpperCase()}
-                </Text>
-              </View>
-
-              <PressableScale>
-                <PlayCircle size="32" color={colors.gray} />
-              </PressableScale>
-            </TouchableOpacity>
-          )}
+          renderItem={({ item }) => <PodcastItem key={item.id} item={item} />}
           onEndReached={() => {
             if (hasNextPage && !isFetchingNextPage) {
               fetchNextPage();
