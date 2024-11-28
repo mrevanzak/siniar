@@ -59,12 +59,12 @@ export default function Home() {
         <SearchNormal size={20} color={colors.charcoal[600]} />
       </View>
 
-      <View className="mb-14 flex-1 gap-3">
+      <View className="flex-1 gap-3">
         <Text className="mt-4 font-bold">Podcasts</Text>
-        {/** -14 for floating-player's height */}
         <FlashList
           // little hax, source: https://github.com/Shopify/flash-list/issues/854
           data={computedData?.slice(0)}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
           refreshing={isFetching}
           onRefresh={refetch}
           estimatedItemSize={96}

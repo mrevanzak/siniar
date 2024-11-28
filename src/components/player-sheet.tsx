@@ -1,68 +1,48 @@
 /** eslint-disable max-lines-per-function */
 import type { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { type AudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { BlurView } from 'expo-blur';
 import {
   Backward10Seconds,
   Forward10Seconds,
   Next,
-  PauseCircle,
-  PlayCircle,
   Previous,
   Sound,
 } from 'iconsax-react-native';
-import { forwardRef, useState } from 'react';
+import { forwardRef } from 'react';
 import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import TrackPlayer, {
+  useActiveTrack,
+  useIsPlaying,
+  useProgress,
+} from 'react-native-track-player';
 
-import type { Podcast } from '@/api/podcasts/schema';
 import { formatDuration } from '@/lib';
 
+import { PlayButton } from './play-button';
 import { colors,Image, Modal, type ModalProps, Text, View } from './ui';
 import { PressableScale } from './ui/pressable-scale';
 
-type PlayerSheetProps = Omit<ModalProps, 'children'> & {
-  data: Podcast;
-  player: AudioPlayer;
-};
+type PlayerSheetProps = Omit<ModalProps, 'children'> & {};
 
 export const PlayerSheet = forwardRef<BottomSheetModal, PlayerSheetProps>(
   // eslint-disable-next-line max-lines-per-function
-  ({ data, player: _player, ...rest }, ref) => {
-    const player = useAudioPlayerStatus(_player);
-    const [isPlaying, setIsPlaying] = useState(player.playing);
+  (props, ref) => {
+    const activeTrack = useActiveTrack();
+    const { duration, position } = useProgress();
+    const { playing } = useIsPlaying();
 
     const playbackStyle = useAnimatedStyle(() => ({
-      width: withTiming(
-        player.currentTime > 0 && player.duration > 0
-          ? `${(player.currentTime / player.duration) * 100}%`
-          : '0%',
-        {
-          duration: 1000,
-        },
-      ),
+      width: withTiming(playing ? `${(position / duration) * 100}%` : '0%', {
+        duration: 1000,
+      }),
     }));
-
-    function onPlay() {
-      if (player.playing) {
-        _player.pause();
-        setIsPlaying(false);
-        return;
-      }
-
-      _player.play();
-      setIsPlaying(true);
-    }
-
-    async function onSeekTo(second: number) {
-      await _player.seekTo(new Date(player.currentTime).getSeconds() + second);
-    }
 
     return (
       <Modal
-        {...rest}
+        {...props}
         ref={ref}
         index={0}
         snapPoints={['100%']}
@@ -73,25 +53,25 @@ export const PlayerSheet = forwardRef<BottomSheetModal, PlayerSheetProps>(
         title="Now Playing"
       >
         <Image
-          source={{ uri: data?.image_url }}
+          source={{ uri: activeTrack?.artwork }}
           className="aspect-square w-screen self-center rounded-lg"
           contentFit="contain"
         />
         <View className="mb-safe flex-1 justify-evenly">
           <View>
             <Text className="mt-2.5 text-center text-sm font-semibold">
-              {data?.title}
+              {activeTrack?.title}
             </Text>
-            <Text className="text-center text-sm">React Native Radio</Text>
+            <Text className="text-center text-sm">{activeTrack?.artist}</Text>
           </View>
 
           <View>
             <View className="mb-2.5 flex-row justify-between">
               <Text className="text-xs font-semibold">
-                {formatDuration(player.currentTime)}
+                {formatDuration(position)}
               </Text>
               <Text className="text-xs font-semibold">
-                {formatDuration(player.duration)}
+                {formatDuration(duration)}
               </Text>
             </View>
             <View>
@@ -112,19 +92,13 @@ export const PlayerSheet = forwardRef<BottomSheetModal, PlayerSheetProps>(
           </View>
 
           <View className="flex-row items-center justify-center gap-5">
-            <PressableScale onPress={async () => await onSeekTo(-10)}>
+            <PressableScale onPress={() => TrackPlayer.seekBy(-10)}>
               <Backward10Seconds size={24} color={colors.gray} />
             </PressableScale>
             <Previous size={24} color={colors.gray} />
-            <PressableScale onPress={onPlay}>
-              {isPlaying ? (
-                <PauseCircle size="60" color={colors.gray} variant="Bold" />
-              ) : (
-                <PlayCircle size="60" color={colors.gray} variant="Bold" />
-              )}
-            </PressableScale>
+            <PlayButton size={60} />
             <Next size={24} color={colors.gray} />
-            <PressableScale onPress={async () => await onSeekTo(+10)}>
+            <PressableScale onPress={() => TrackPlayer.seekBy(+10)}>
               <Forward10Seconds size={24} color={colors.gray} />
             </PressableScale>
           </View>

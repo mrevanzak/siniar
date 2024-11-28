@@ -1,35 +1,41 @@
-import { useAudioPlayer } from 'expo-audio';
+import { useQuery } from '@tanstack/react-query';
 import { BlurView } from 'expo-blur';
-import { PauseCircle, PlayCircle } from 'iconsax-react-native';
 import { useColorScheme } from 'nativewind';
-import { useState } from 'react';
+import { useEffect } from 'react';
+import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
 
-import { useFeaturedPodcast } from '@/api/podcasts/use-featured-podcast';
+import { getFeaturedPodcastQuery } from '@/api/podcasts/use-featured-podcast';
 
+import { PlayButton } from './play-button';
 import { PlayerSheet } from './player-sheet';
-import { colors, Image, Text, TouchableOpacity, useModal,View } from './ui';
-import { PressableScale } from './ui/pressable-scale';
+import { Image, Text, TouchableOpacity, useModal,View } from './ui';
 
+// eslint-disable-next-line max-lines-per-function
 export function FloatingPlayer() {
   const { colorScheme } = useColorScheme();
-  const featuredPodcastQuery = useFeaturedPodcast();
 
+  const activeTrack = useActiveTrack();
+
+  const featuredPodcastQuery = useQuery({
+    ...getFeaturedPodcastQuery,
+    enabled: !activeTrack,
+  });
   const data = featuredPodcastQuery.data?.collection[0];
-  const player = useAudioPlayer(data?.enclosure_url);
-  const [isPlaying, setIsPlaying] = useState(player.playing);
+
+  useEffect(() => {
+    if (!data) return;
+
+    TrackPlayer.add([
+      {
+        url: data.enclosure_url,
+        title: data.title,
+        artist: 'React Native Radio',
+        artwork: data.image_url,
+      },
+    ]);
+  }, [data]);
 
   const modal = useModal();
-
-  function onPlay() {
-    if (player.playing) {
-      player.pause();
-      setIsPlaying(false);
-      return;
-    }
-
-    player.play();
-    setIsPlaying(true);
-  }
 
   return (
     <TouchableOpacity onPress={() => modal.present()}>
@@ -41,31 +47,17 @@ export function FloatingPlayer() {
       >
         <View className="flex-row items-center gap-4">
           <Image
-            source={{ uri: data?.image_url }}
+            source={{ uri: activeTrack?.artwork }}
             className="size-10 rounded-lg"
             contentFit="contain"
           />
-          <Text className="text-sm">{data?.title}</Text>
+          <Text className="text-sm">{activeTrack?.title}</Text>
         </View>
 
-        <PressableScale onPress={onPlay}>
-          {isPlaying ? (
-            <PauseCircle
-              size="32"
-              color={colorScheme === 'dark' ? colors.gray : colors['dark-gray']}
-              variant="Bold"
-            />
-          ) : (
-            <PlayCircle
-              size="32"
-              color={colorScheme === 'dark' ? colors.gray : colors['dark-gray']}
-              variant="Bold"
-            />
-          )}
-        </PressableScale>
+        <PlayButton />
       </BlurView>
 
-      {data && <PlayerSheet ref={modal.ref} data={data} player={player} />}
+      <PlayerSheet ref={modal.ref} />
     </TouchableOpacity>
   );
 }

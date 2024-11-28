@@ -1,16 +1,10 @@
-import { PlayCircle } from 'iconsax-react-native';
+import type { TouchableOpacityProps } from 'react-native';
+import { useActiveTrack, useIsPlaying } from 'react-native-track-player';
 
 import type { Podcast } from '@/api/podcasts/schema';
 
-import {
-  colors,
-  Image,
-  PressableScale,
-  Skeleton,
-  Text,
-  TouchableOpacity,
-  View,
-} from './ui';
+import { PlayButton } from './play-button';
+import { Image, Skeleton, Text, TouchableOpacity, View } from './ui';
 
 type Props =
   | {
@@ -22,10 +16,18 @@ type Props =
       skeleton: boolean;
     };
 
-export function PodcastItem({ item, skeleton = false }: Props) {
+export function PodcastItem({
+  item,
+  skeleton = false,
+  ...rest
+}: Props & TouchableOpacityProps) {
+  const activeTrack = useActiveTrack();
+  const { playing } = useIsPlaying();
+  const isPlaying = activeTrack?.url === item?.enclosure_url && playing;
+
   return (
     <Skeleton.Group show={skeleton}>
-      <TouchableOpacity className="flex-row items-center gap-4 py-2">
+      <TouchableOpacity className="flex-row items-center gap-4 py-2" {...rest}>
         <Skeleton>
           <Image source={item?.image_url} className="size-16 rounded-lg" />
         </Skeleton>
@@ -44,11 +46,7 @@ export function PodcastItem({ item, skeleton = false }: Props) {
           </Skeleton>
         </View>
 
-        {!skeleton && (
-          <PressableScale>
-            <PlayCircle size="32" color={colors.gray} />
-          </PressableScale>
-        )}
+        {!skeleton && <PlayButton isPlaying={isPlaying} />}
       </TouchableOpacity>
     </Skeleton.Group>
   );

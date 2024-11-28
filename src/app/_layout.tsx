@@ -6,14 +6,17 @@ import { ThemeProvider } from '@react-navigation/native';
 import { Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import type { ReactNode } from 'react';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import FlashMessage from 'react-native-flash-message';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import TrackPlayer from 'react-native-track-player';
 
 import { APIProvider } from '@/api';
-import { hydrateAuth, loadSelectedTheme } from '@/lib';
+import { playbackService } from '@/constants/playback-service';
+import { hydrateAuth, loadSelectedTheme, useSetupPlayer } from '@/lib';
+import { useLogPlayerState } from '@/lib/hooks/use-log-player-state';
 import { useThemeConfig } from '@/lib/use-theme-config';
 
 export { ErrorBoundary } from 'expo-router';
@@ -21,12 +24,14 @@ export { ErrorBoundary } from 'expo-router';
 hydrateAuth();
 loadSelectedTheme();
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-// SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync();
 // Set the animation options. This is optional.
 SplashScreen.setOptions({
   duration: 500,
   fade: true,
 });
+
+TrackPlayer.registerPlaybackService(() => playbackService);
 
 export default function RootLayout() {
   return (
@@ -38,6 +43,15 @@ export default function RootLayout() {
 
 function Providers({ children }: { children: ReactNode }) {
   const theme = useThemeConfig();
+  const handleTrackPlayerLoaded = useCallback(() => {
+    SplashScreen.hideAsync();
+  }, []);
+
+  useSetupPlayer({
+    onLoad: handleTrackPlayerLoaded,
+  });
+  useLogPlayerState();
+
   return (
     <GestureHandlerRootView
       style={styles.container}
