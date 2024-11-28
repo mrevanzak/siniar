@@ -4,6 +4,8 @@ import { Dimensions, Platform } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 import { twMerge } from 'tailwind-merge';
 
+import colors from './colors';
+
 export const IS_IOS = Platform.OS === 'ios';
 const { width, height } = Dimensions.get('screen');
 
@@ -18,7 +20,7 @@ export const showError = (error: AxiosError) => {
   showMessage({
     message: 'Error',
     description,
-    type: 'danger',
+    backgroundColor: colors['primary-red'],
     duration: 4000,
     icon: 'danger',
   });
@@ -27,7 +29,7 @@ export const showError = (error: AxiosError) => {
 export const showErrorMessage = (message = 'Something went wrong ') => {
   showMessage({
     message,
-    type: 'danger',
+    backgroundColor: colors['primary-red'],
     duration: 4000,
   });
 };
