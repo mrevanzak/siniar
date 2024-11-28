@@ -50,21 +50,28 @@ export function FloatingPlayer() {
       onPress={() => modal.present()}
     >
       <BlurView
-        className="absolute inset-x-3 bottom-28 h-14 flex-row items-center justify-between overflow-hidden rounded-lg px-3"
+        className="absolute inset-x-3 bottom-28 h-14 justify-center overflow-hidden rounded-lg px-3"
         experimentalBlurMethod="dimezisBlurView"
         tint="dark"
         intensity={colorScheme === 'dark' ? 100 : 15}
       >
-        <View className="flex-row items-center gap-4">
-          <Image
-            source={{ uri: activeTrack.artwork }}
-            className="size-10 rounded-lg"
-            contentFit="contain"
-          />
-          <Text className="text-sm">{activeTrack.title}</Text>
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center gap-4">
+            <Image
+              source={{ uri: activeTrack.artwork }}
+              className="size-10 rounded-lg"
+              contentFit="contain"
+            />
+            <Text
+              className="flex-1 text-sm"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {activeTrack.title}
+            </Text>
+            <PlayButton className="" />
+          </View>
         </View>
-
-        <PlayButton />
       </BlurView>
 
       <PlayerSheet ref={modal.ref} />
