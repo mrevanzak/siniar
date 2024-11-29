@@ -1,9 +1,10 @@
-import { FlashList } from '@shopify/flash-list';
+import { FlashList, type ListRenderItem } from '@shopify/flash-list';
 import { NotificationBing, SearchNormal } from 'iconsax-react-native';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { ActivityIndicator, TextInput } from 'react-native';
 import { useDebounceValue } from 'usehooks-ts';
 
+import type { Podcast } from '@/api/podcasts/schema';
 import { usePodcasts } from '@/api/podcasts/use-podcasts';
 import { PodcastItem } from '@/components/podcast-item';
 import { colors,Image, SafeAreaView, Text, View } from '@/components/ui';
@@ -28,7 +29,12 @@ export default function Home() {
     [data],
   );
 
-  const favorites = useFavoritesStore.use.favorites()
+  const favorites = useFavoritesStore.use.favorites();
+
+  const renderItem: ListRenderItem<Podcast> = useCallback(
+    ({ item }) => <PodcastItem key={item.id} item={item} />,
+    [],
+  );
 
   return (
     <SafeAreaView className="flex-1 gap-5 px-4">
@@ -67,7 +73,7 @@ export default function Home() {
         <FlashList
           // little hax, source: https://github.com/Shopify/flash-list/issues/854
           data={computedData?.slice(0)}
-          keyExtractor={(item, index) => `${item.id}-${index}`}
+          keyExtractor={(item) => item.id}
           extraData={favorites}
           refreshing={isFetching}
           onRefresh={refetch}
@@ -85,7 +91,7 @@ export default function Home() {
               </Text>
             )
           }
-          renderItem={({ item }) => <PodcastItem key={item.id} item={item} />}
+          renderItem={renderItem}
           onEndReached={() => {
             if (hasNextPage && !isFetchingNextPage) {
               fetchNextPage();
