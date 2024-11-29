@@ -54,6 +54,7 @@ export function FloatingPlayer() {
             <View className="flex-row items-center gap-4">
               <Image
                 source={{ uri: activeTrack.artwork }}
+                sharedTransitionTag={activeTrack.artwork}
                 className="size-10 rounded-lg"
                 contentFit="contain"
               />

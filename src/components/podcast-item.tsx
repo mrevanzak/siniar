@@ -31,7 +31,11 @@ export function PodcastItem({
     <Skeleton.Group show={skeleton}>
       <TouchableOpacity className="flex-row items-center gap-4 py-2" {...rest}>
         <Skeleton>
-          <Image source={item?.image_url} className="size-16 rounded-lg" />
+          <Image
+            source={item?.image_url}
+            className="size-16 rounded-lg"
+            sharedTransitionTag={item?.image_url}
+          />
         </Skeleton>
 
         <View className="flex-1">

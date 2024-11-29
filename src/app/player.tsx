@@ -60,6 +60,7 @@ export default function PlayerModal() {
       />
       <Image
         source={{ uri: activeTrack?.artwork }}
+        sharedTransitionTag={activeTrack?.artwork}
         className="aspect-square w-full self-center rounded-lg"
         contentFit="contain"
       />
