@@ -1,4 +1,4 @@
-import { PauseCircle, PlayCircle } from 'iconsax-react-native';
+import { type IconProps, PauseCircle, PlayCircle } from 'iconsax-react-native';
 import { useColorScheme } from 'nativewind';
 import type { TouchableOpacityProps } from 'react-native';
 import TrackPlayer, {
@@ -16,9 +16,15 @@ type Props = {
   size?: number;
   isPlaying?: boolean;
   selectedItem?: Podcast;
+  iconProps?: IconProps;
 } & TouchableOpacityProps;
 
-export function PlayButton({ size = 32, selectedItem, ...rest }: Props) {
+export function PlayButton({
+  size = 32,
+  selectedItem,
+  iconProps,
+  ...rest
+}: Props) {
   const { colorScheme } = useColorScheme();
 
   const buttonColor =
@@ -49,13 +55,23 @@ export function PlayButton({ size = 32, selectedItem, ...rest }: Props) {
     <PressableScale {...rest} onPress={onPlay}>
       {match([isPlaying, isLoading])
         .with([false, P.boolean], () => (
-          <PlayCircle size={size} color={buttonColor} variant="Bold" />
+          <PlayCircle
+            size={size}
+            color={buttonColor}
+            variant="Bold"
+            {...iconProps}
+          />
         ))
         .with([true, true], () => (
           <ActivityIndicator size={size} color={buttonColor} />
         ))
         .with([true, false], () => (
-          <PauseCircle size={size} color={buttonColor} variant="Bold" />
+          <PauseCircle
+            size={size}
+            color={buttonColor}
+            variant="Bold"
+            {...iconProps}
+          />
         ))
         .exhaustive()}
     </PressableScale>

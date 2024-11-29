@@ -8,6 +8,7 @@ import { usePodcasts } from '@/api/podcasts/use-podcasts';
 import { PodcastItem } from '@/components/podcast-item';
 import { colors,Image, SafeAreaView, Text, View } from '@/components/ui';
 import { PressableScale } from '@/components/ui/pressable-scale';
+import { useFavoritesStore } from '@/lib/stores/favorites';
 
 // eslint-disable-next-line max-lines-per-function
 export default function Home() {
@@ -26,6 +27,8 @@ export default function Home() {
     () => data?.pages.flatMap((page) => page.collection),
     [data],
   );
+
+  const favorites = useFavoritesStore.use.favorites()
 
   return (
     <SafeAreaView className="flex-1 gap-5 px-4">
@@ -65,6 +68,7 @@ export default function Home() {
           // little hax, source: https://github.com/Shopify/flash-list/issues/854
           data={computedData?.slice(0)}
           keyExtractor={(item, index) => `${item.id}-${index}`}
+          extraData={favorites}
           refreshing={isFetching}
           onRefresh={refetch}
           estimatedItemSize={96}

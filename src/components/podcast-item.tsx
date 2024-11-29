@@ -1,8 +1,10 @@
+import React from 'react';
 import type { TouchableOpacityProps } from 'react-native';
 import { useActiveTrack, useIsPlaying } from 'react-native-track-player';
 
 import type { Podcast } from '@/api/podcasts/schema';
 
+import { FavoriteButton } from './favorite-button';
 import { PlayButton } from './play-button';
 import { Image, Skeleton, Text, TouchableOpacity, View } from './ui';
 
@@ -46,7 +48,16 @@ export function PodcastItem({
           </Skeleton>
         </View>
 
-        {!skeleton && <PlayButton isPlaying={isPlaying} selectedItem={item} />}
+        {!skeleton && item && (
+          <React.Fragment>
+            <FavoriteButton selectedItem={item} />
+            <PlayButton
+              isPlaying={isPlaying}
+              selectedItem={item}
+              iconProps={{ variant: 'Linear' }}
+            />
+          </React.Fragment>
+        )}
       </TouchableOpacity>
     </Skeleton.Group>
   );
