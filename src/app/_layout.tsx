@@ -3,7 +3,7 @@ import '../../global.css';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ThemeProvider } from '@react-navigation/native';
-import { Slot } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import type { ReactNode } from 'react';
 import React, { useCallback } from 'react';
@@ -36,7 +36,18 @@ TrackPlayer.registerPlaybackService(() => playbackService);
 export default function RootLayout() {
   return (
     <Providers>
-      <Slot />
+      <Stack initialRouteName="(app)" screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name="player"
+          options={{
+            gestureEnabled: true,
+            fullScreenGestureEnabled: true,
+            presentation: 'transparentModal',
+            gestureDirection: 'vertical',
+            animationDuration: 400,
+          }}
+        />
+      </Stack>
     </Providers>
   );
 }

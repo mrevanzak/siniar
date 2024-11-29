@@ -34,7 +34,8 @@ import type {
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModal, useBottomSheet } from '@gorhom/bottom-sheet';
 import * as React from 'react';
-import { Pressable, View } from 'react-native';
+import type { StyleProp } from 'react-native';
+import { Pressable, type TextStyle, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Path, Svg } from 'react-native-svg';
 
@@ -52,6 +53,7 @@ type ModalHeaderProps = {
   title?: string;
   hideCloseButton?: boolean;
   className?: string;
+  titleStyle?: StyleProp<TextStyle>;
   dismiss: () => void;
 };
 
@@ -163,26 +165,34 @@ const getDetachedProps = (detached: boolean) => {
  * ModalHeader
  */
 
-const ModalHeader = React.memo(
-  ({ title, dismiss, hideCloseButton, className }: ModalHeaderProps) => {
+export const ModalHeader = React.memo(
+  ({
+    title,
+    dismiss,
+    hideCloseButton,
+    className,
+    titleStyle,
+  }: ModalHeaderProps) => {
     return (
       <View className={className}>
         {hideCloseButton ? (
           <View className="h-1 w-6 self-center rounded-full bg-gray" />
         ) : (
-          <>
-            <View className="bg-gray-400 dark:bg-gray-700 mb-8 mt-2 h-1 w-12 self-center rounded-lg" />
-            <CloseButton close={dismiss} />
-          </>
+          <CloseButton close={dismiss} />
         )}
-        {title && (
+        {title ? (
           <View className="flex-row px-2 py-4">
             <View className="flex-1">
-              <Text className="text-center text-[16px] font-bold text-[#26313D] dark:text-white">
+              <Text
+                className="text-center text-[16px] font-bold text-[#26313D] dark:text-white"
+                style={titleStyle}
+              >
                 {title}
               </Text>
             </View>
           </View>
+        ) : (
+          <View className="bg-gray-400 dark:bg-gray-700 mb-8 mt-2 h-1 w-12 self-center rounded-lg" />
         )}
       </View>
     );
