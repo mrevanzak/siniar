@@ -84,7 +84,7 @@
     "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "~4.1.0",
     "react-native-svg": "~15.8.0",
-    "react-native-track-player": "puckey/react-native-track-player#feature/update-react-native",
+    "react-native-track-player": "^4.1.1",
     "react-native-web": "~0.19.13",
     "react-query-kit": "^3.3.0",
     "tailwind-variants": "^0.2.1",
@@ -156,5 +156,8 @@
   },
   "osMetadata": {
     "initVersion": "7.0.2"
+  },
+  "patchedDependencies": {
+    "react-native-track-player@4.1.1": "patches/react-native-track-player@4.1.1.patch"
   }
 }
