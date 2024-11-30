@@ -28,6 +28,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
+          headerShown: true,
+          headerTitle: 'Explore New Podcasts',
           tabBarIcon: ({ color }) => <Category color={color} />,
         }}
       />

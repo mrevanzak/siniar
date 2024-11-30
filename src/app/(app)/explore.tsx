@@ -1,23 +1,88 @@
-import * as React from 'react';
+import { FlashList, type ListRenderItem } from '@shopify/flash-list';
+import { SearchNormal } from 'iconsax-react-native';
+import { useCallback, useMemo } from 'react';
+import { ActivityIndicator, TextInput } from 'react-native';
+import { useDebounceValue } from 'usehooks-ts';
 
-import { Buttons } from '@/components/buttons';
-import { Colors } from '@/components/colors';
-import { Inputs } from '@/components/inputs';
-import { Typography } from '@/components/typography';
-import { FocusAwareStatusBar, SafeAreaView, ScrollView } from '@/components/ui';
+import type { Podcast } from '@/api/podcasts/schema';
+import { usePodcasts } from '@/api/podcasts/use-podcasts';
+import { PodcastItem } from '@/components/podcast-item';
+import { colors,Text, View } from '@/components/ui';
+import { useFavoritesStore } from '@/lib/stores/favorites';
 
-export default function Style() {
+// eslint-disable-next-line max-lines-per-function
+export default function Explore() {
+  const [search, setSearch] = useDebounceValue('', 500);
+
+  const {
+    data,
+    isLoading,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+  } = usePodcasts(search);
+  const computedData = useMemo(
+    () => data?.pages.flatMap((page) => page.collection),
+    [data],
+  );
+
+  const favorites = useFavoritesStore.use.favorites();
+
+  const renderItem: ListRenderItem<Podcast> = useCallback(
+    ({ item }) => <PodcastItem key={item.id} item={item} />,
+    [],
+  );
+
   return (
-    <>
-      <FocusAwareStatusBar />
-      <ScrollView className="px-4">
-        <SafeAreaView className="flex-1">
-          <Typography />
-          <Colors />
-          <Buttons />
-          <Inputs />
-        </SafeAreaView>
-      </ScrollView>
-    </>
+    <View className="mt-6 flex-1 gap-5 px-4">
+      <View className="flex-row items-center justify-between rounded-full bg-neutral-200 px-6 py-4 dark:bg-neutral-800">
+        <TextInput
+          onChangeText={setSearch}
+          placeholder="Search your favorite podcast..."
+          placeholderTextColor={colors.charcoal[600]}
+          className="flex-1 dark:text-white"
+        />
+        <SearchNormal size={20} color={colors.charcoal[600]} />
+      </View>
+
+      <View className="flex-1 gap-3">
+        <Text className="mt-4 font-bold">Podcasts</Text>
+        <FlashList
+          // little hax, source: https://github.com/Shopify/flash-list/issues/854
+          data={computedData?.slice(0)}
+          keyExtractor={(item) => item.id}
+          extraData={favorites}
+          refreshing={isFetching}
+          onRefresh={refetch}
+          estimatedItemSize={96}
+          ListEmptyComponent={
+            isLoading ? (
+              <View>
+                {Array.from({ length: 4 }, (_, index) => (
+                  <PodcastItem key={index} skeleton />
+                ))}
+              </View>
+            ) : (
+              <Text className="text-center text-sm opacity-70">
+                No podcasts found
+              </Text>
+            )
+          }
+          renderItem={renderItem}
+          onEndReached={() => {
+            if (hasNextPage && !isFetchingNextPage) {
+              fetchNextPage();
+            }
+          }}
+          ListFooterComponent={
+            isFetchingNextPage ? (
+              <ActivityIndicator size="small" color={colors['primary-red']} />
+            ) : null
+          }
+        />
+      </View>
+    </View>
   );
 }
