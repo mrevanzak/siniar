@@ -15,6 +15,13 @@ export default function TabLayout() {
         animation: 'shift',
         tabBarActiveTintColor: colors.white,
         tabBarInactiveTintColor: colors.gray,
+        headerStyle: {
+          backgroundColor: 'transparent',
+        },
+        headerTitleStyle: {
+          fontSize: 20,
+          fontFamily: 'Manrope_400Regular',
+        },
       }}
       tabBar={(props) => <TabBar {...props} />}
     >
