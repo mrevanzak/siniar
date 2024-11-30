@@ -58,7 +58,7 @@ export default function Home() {
 
       <Text className="text-xl font-bold">Explore New Podcasts</Text>
 
-      <View className="flex-row items-center justify-between rounded-full px-6 py-4 dark:bg-neutral-800">
+      <View className="flex-row items-center justify-between rounded-full bg-neutral-200 px-6 py-4 dark:bg-neutral-800">
         <TextInput
           onChangeText={setSearch}
           placeholder="Search your favorite podcast..."
