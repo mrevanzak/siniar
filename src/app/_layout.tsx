@@ -14,6 +14,7 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import TrackPlayer from 'react-native-track-player';
 
 import { APIProvider } from '@/api';
+import { FocusAwareStatusBar } from '@/components/ui';
 import { playbackService } from '@/constants/playback-service';
 import { hydrateAuth, loadSelectedTheme, useSetupPlayer } from '@/lib';
 import { useLogPlayerState } from '@/lib/hooks/use-log-player-state';
@@ -72,6 +73,7 @@ function Providers({ children }: { children: ReactNode }) {
         <ThemeProvider value={theme}>
           <APIProvider>
             <BottomSheetModalProvider>
+              <FocusAwareStatusBar />
               {children}
               <FlashMessage position="top" />
             </BottomSheetModalProvider>
