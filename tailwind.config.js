@@ -1,4 +1,5 @@
 const colors = require('./src/components/ui/colors');
+const { platformSelect } = require('nativewind/theme');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -9,7 +10,10 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        manrope: ['Manrope_400Regular'],
+        manrope: platformSelect({
+          ios: 'Manrope',
+          android: 'Manrope_400Regular',
+        }),
       },
       colors,
     },

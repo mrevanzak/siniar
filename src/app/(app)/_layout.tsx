@@ -3,6 +3,7 @@ import { Feather } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { Category, Heart, Home } from 'iconsax-react-native';
 import React from 'react';
+import { Platform } from 'react-native';
 
 import { colors } from '@/components/ui';
 import { TabBar } from '@/components/ui/tab-bar';
@@ -21,7 +22,11 @@ export default function TabLayout() {
         headerTitleAlign: 'center',
         headerTitleStyle: {
           fontSize: 20,
-          fontFamily: 'Manrope_400Regular',
+          fontFamily: Platform.select({
+            ios: 'Manrope',
+            android: 'Manrope_400Regular',
+          }),
+          fontWeight: 700,
         },
         headerShadowVisible: false,
       }}
