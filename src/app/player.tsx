@@ -100,6 +100,7 @@ export default function PlayerModal() {
         startContent={
           <PressableScale
             className="absolute left-0 top-2.5 rounded-full border border-white p-2 dark:border-dark-gray"
+            hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
             onPress={() => router.back()}
           >
             <ArrowLeft2 size={24} color={color} />

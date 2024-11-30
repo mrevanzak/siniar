@@ -179,10 +179,9 @@ export const ModalHeader = React.memo(
         {/* handle */}
         <View className="h-1 w-6 self-center rounded-full bg-gray" />
 
-        {startContent}
         {title ? (
           <Text
-            className="pointer-events-none py-4 text-center font-bold text-[#26313D] dark:text-white"
+            className="py-4 text-center font-bold text-[#26313D] dark:text-white"
             style={titleStyle}
           >
             {title}
@@ -190,6 +189,7 @@ export const ModalHeader = React.memo(
         ) : (
           <View className="bg-gray-400 dark:bg-gray-700 mb-8 mt-2 h-1 w-12 self-center rounded-lg" />
         )}
+        {startContent}
         {endContent ? endContent : <CloseButton close={() => dismiss} />}
       </View>
     );
