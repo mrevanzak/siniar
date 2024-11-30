@@ -98,10 +98,6 @@ export default function PlayerModal() {
             style={{
               alignItems: 'flex-start',
             }}
-            hapticMode="both"
-            onHapticFeedback={() =>
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
-            }
             renderContainer={({ style, seekStyle }) => (
               <View style={[style, { backgroundColor: 'transparent' }]}>
                 <View className="flex-row">
@@ -135,6 +131,7 @@ export default function PlayerModal() {
             }}
             onValueChange={async (value) => {
               await TrackPlayer.seekTo(value * duration);
+              await Haptics.selectionAsync();
             }}
             onSlidingComplete={async (value) => {
               // if the user is not sliding, we should not update the position
