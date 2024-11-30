@@ -18,10 +18,12 @@ export default function TabLayout() {
         headerStyle: {
           backgroundColor: 'transparent',
         },
+        headerTitleAlign: 'center',
         headerTitleStyle: {
           fontSize: 20,
           fontFamily: 'Manrope_400Regular',
         },
+        headerShadowVisible: false,
       }}
       tabBar={(props) => <TabBar {...props} />}
     >
