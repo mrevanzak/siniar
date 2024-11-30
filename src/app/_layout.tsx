@@ -42,6 +42,7 @@ export default function RootLayout() {
           name="player"
           options={{
             gestureEnabled: true,
+            animation: 'slide_from_bottom',
             fullScreenGestureEnabled: true,
             presentation: 'transparentModal',
             gestureDirection: 'vertical',
