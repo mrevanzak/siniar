@@ -39,22 +39,24 @@ import { Pressable, type TextStyle, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Path, Svg } from 'react-native-svg';
 
+import { PressableScale } from './pressable-scale';
 import { Text } from './text';
+import { cn } from './utils';
 
 export type ModalProps = BottomSheetModalProps & {
   headerClassName?: string;
   title?: string;
-  hideCloseButton?: boolean;
 };
 
 type ModalRef = React.ForwardedRef<BottomSheetModal>;
 
 type ModalHeaderProps = {
   title?: string;
-  hideCloseButton?: boolean;
   className?: string;
   titleStyle?: StyleProp<TextStyle>;
-  dismiss: () => void;
+  dismiss?: () => void;
+  endContent?: React.ReactNode;
+  startContent?: React.ReactNode;
 };
 
 export const useModal = () => {
@@ -73,7 +75,6 @@ export const Modal = React.forwardRef(
     {
       snapPoints: _snapPoints = ['60%'],
       title,
-      hideCloseButton = false,
       detached = false,
       headerClassName,
       ...props
@@ -97,11 +98,10 @@ export const Modal = React.forwardRef(
         <ModalHeader
           title={title}
           dismiss={modal.dismiss}
-          hideCloseButton={hideCloseButton}
           className={headerClassName}
         />
       ),
-      [title, modal.dismiss, hideCloseButton, headerClassName],
+      [title, modal.dismiss, headerClassName],
     );
 
     return (
@@ -169,31 +169,28 @@ export const ModalHeader = React.memo(
   ({
     title,
     dismiss,
-    hideCloseButton,
-    className,
+    endContent,
     titleStyle,
+    startContent,
+    className,
   }: ModalHeaderProps) => {
     return (
-      <View className={className}>
-        {hideCloseButton ? (
-          <View className="h-1 w-6 self-center rounded-full bg-gray" />
-        ) : (
-          <CloseButton close={dismiss} />
-        )}
+      <View className={cn('px-3', className)}>
+        {/* handle */}
+        <View className="h-1 w-6 self-center rounded-full bg-gray" />
+
+        {startContent}
         {title ? (
-          <View className="flex-row px-2 py-4">
-            <View className="flex-1">
-              <Text
-                className="text-center text-[16px] font-bold text-[#26313D] dark:text-white"
-                style={titleStyle}
-              >
-                {title}
-              </Text>
-            </View>
-          </View>
+          <Text
+            className="pointer-events-none py-4 text-center font-bold text-[#26313D] dark:text-white"
+            style={titleStyle}
+          >
+            {title}
+          </Text>
         ) : (
           <View className="bg-gray-400 dark:bg-gray-700 mb-8 mt-2 h-1 w-12 self-center rounded-lg" />
         )}
+        {endContent ? endContent : <CloseButton close={() => dismiss} />}
       </View>
     );
   },
@@ -201,9 +198,9 @@ export const ModalHeader = React.memo(
 
 const CloseButton = ({ close }: { close: () => void }) => {
   return (
-    <Pressable
+    <PressableScale
       onPress={close}
-      className="absolute right-3 top-3 size-[24px] items-center justify-center "
+      className="absolute right-3 top-5 size-[24px] items-center justify-center "
       hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
       accessibilityLabel="close modal"
       accessibilityRole="button"
@@ -218,6 +215,6 @@ const CloseButton = ({ close }: { close: () => void }) => {
       >
         <Path d="M18.707 6.707a1 1 0 0 0-1.414-1.414L12 10.586 6.707 5.293a1 1 0 0 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293Z" />
       </Svg>
-    </Pressable>
+    </PressableScale>
   );
 };

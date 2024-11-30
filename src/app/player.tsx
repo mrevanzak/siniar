@@ -1,7 +1,8 @@
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
+  ArrowLeft2,
   Backward10Seconds,
   Forward10Seconds,
   Next,
@@ -9,7 +10,7 @@ import {
   Sound,
 } from 'iconsax-react-native';
 import { useColorScheme } from 'nativewind';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Slider } from 'react-native-awesome-slider';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 import TrackPlayer, {
@@ -17,6 +18,7 @@ import TrackPlayer, {
   useProgress,
 } from 'react-native-track-player';
 
+import { podcastSchema } from '@/api/podcasts/schema';
 import { PlayButton } from '@/components/play-button';
 import {
   colors,
@@ -35,8 +37,45 @@ export default function PlayerModal() {
   const isDark = colorScheme === 'dark';
   const color = isDark ? colors.gray : colors.white;
 
+  const params = useLocalSearchParams<{ podcast: string }>();
+  const data = params?.podcast
+    ? podcastSchema.parse(JSON.parse(params.podcast))
+    : null;
+
   const activeTrack = useActiveTrack();
   const { duration, position } = useProgress();
+  const isSelected = data ? data.enclosure_url === activeTrack?.url : true;
+
+  const computedData = useMemo(() => {
+    if (isSelected) {
+      return {
+        image: activeTrack?.artwork,
+        url: activeTrack?.url,
+        title: activeTrack?.title,
+        position,
+        duration,
+      };
+    }
+
+    return {
+      image: data?.image_url,
+      url: data?.enclosure_url,
+      title: data?.title,
+      position: 0,
+      duration: data?.duration ?? 0,
+    };
+  }, [
+    activeTrack?.artwork,
+    activeTrack?.title,
+    activeTrack?.url,
+    data?.duration,
+    data?.enclosure_url,
+    data?.image_url,
+    data?.title,
+    duration,
+    isSelected,
+    position,
+  ]);
 
   const isInteracting = useSharedValue(false);
   const progress = useSharedValue(0);
@@ -44,9 +83,9 @@ export default function PlayerModal() {
   const max = useSharedValue(1);
 
   useEffect(() => {
-    if (!isInteracting.value)
+    if (!isInteracting.value && isSelected)
       progress.value = duration > 0 ? position / duration : 0;
-  }, [position, duration]);
+  }, [duration, isInteracting, isSelected, position, progress]);
 
   return (
     <BlurView
@@ -57,12 +96,19 @@ export default function PlayerModal() {
       <ModalHeader
         title="Now Playing"
         titleStyle={{ color }}
-        dismiss={() => router.back()}
-        hideCloseButton
+        className="my-2"
+        startContent={
+          <PressableScale
+            className="absolute left-0 top-2.5 rounded-full border border-white p-2 dark:border-dark-gray"
+            onPress={() => router.back()}
+          >
+            <ArrowLeft2 size={24} color={color} />
+          </PressableScale>
+        }
       />
       <Image
-        source={{ uri: activeTrack?.artwork }}
-        sharedTransitionTag={activeTrack?.artwork}
+        source={computedData.image}
+        sharedTransitionTag={computedData.image}
         className="aspect-square w-full self-center rounded-lg"
         contentFit="contain"
       />
@@ -72,23 +118,24 @@ export default function PlayerModal() {
             className="mt-2.5 text-center text-sm font-semibold"
             style={{ color }}
           >
-            {activeTrack?.title}
+            {computedData.title}
           </Text>
           <Text className="text-center text-sm" style={{ color }}>
-            {activeTrack?.artist}
+            React Native Radio
           </Text>
         </View>
 
         <View className="gap-6">
           <View className="flex-row justify-between">
             <Text className="text-xs font-semibold" style={{ color }}>
-              {formatDuration(position)}
+              {formatDuration(computedData.position)}
             </Text>
             <Text className="text-xs font-semibold" style={{ color }}>
-              {formatDuration(duration)}
+              {formatDuration(computedData.duration)}
             </Text>
           </View>
           <Slider
+            disable={!isSelected}
             progress={progress}
             minimumValue={min}
             maximumValue={max}

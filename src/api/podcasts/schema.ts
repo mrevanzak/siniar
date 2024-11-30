@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const podcastSchema = z.object({
+export const podcastSchema = z.object({
   updated_at: z.string(),
   type: z.union([z.literal('full'), z.literal('trailer'), z.literal('bonus')]),
   token: z.string(),
