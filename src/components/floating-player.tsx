@@ -42,7 +42,13 @@ export function FloatingPlayer() {
   if (!activeTrack) return null;
 
   return (
-    <Link href="/player" asChild>
+    <Link
+      href={{
+        pathname: '/player',
+        params: { podcast: JSON.stringify(data) },
+      }}
+      asChild
+    >
       <AnimatedTouchableOpacity entering={FadeInDown} exiting={FadeInUp}>
         <BlurView
           className="absolute inset-x-3 bottom-28 h-14 justify-center overflow-hidden rounded-lg px-3"

@@ -1,3 +1,5 @@
+import { toast } from '@baronha/ting';
+import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -10,7 +12,7 @@ import {
   Sound,
 } from 'iconsax-react-native';
 import { useColorScheme } from 'nativewind';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { Slider } from 'react-native-awesome-slider';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 import TrackPlayer, {
@@ -18,7 +20,7 @@ import TrackPlayer, {
   useProgress,
 } from 'react-native-track-player';
 
-import { podcastSchema } from '@/api/podcasts/schema';
+import type { Podcast } from '@/api/podcasts/schema';
 import { PlayButton } from '@/components/play-button';
 import {
   colors,
@@ -29,6 +31,8 @@ import {
   View,
 } from '@/components/ui';
 import { formatDuration } from '@/lib';
+import { useDownload } from '@/lib/hooks/use-download';
+import { useDownloadsStore } from '@/lib/stores/downloads';
 
 // eslint-disable-next-line max-lines-per-function
 export default function PlayerModal() {
@@ -38,54 +42,59 @@ export default function PlayerModal() {
   const color = isDark ? colors.gray : colors.white;
 
   const params = useLocalSearchParams<{ podcast: string }>();
-  const data = params?.podcast
-    ? podcastSchema.parse(JSON.parse(params.podcast))
-    : null;
+  const data = JSON.parse(params.podcast) as Podcast;
 
   const activeTrack = useActiveTrack();
-  const { duration, position } = useProgress();
-  const isSelected = data ? data.enclosure_url === activeTrack?.url : true;
-
-  const computedData = useMemo(() => {
-    if (isSelected) {
-      return {
-        image: activeTrack?.artwork,
-        url: activeTrack?.url,
-        title: activeTrack?.title,
-        position,
-        duration,
-      };
-    }
-
-    return {
-      image: data?.image_url,
-      url: data?.enclosure_url,
-      title: data?.title,
-      position: 0,
-      duration: data?.duration ?? 0,
-    };
-  }, [
-    activeTrack?.artwork,
-    activeTrack?.title,
-    activeTrack?.url,
-    data?.duration,
-    data?.enclosure_url,
-    data?.image_url,
-    data?.title,
-    duration,
-    isSelected,
-    position,
-  ]);
+  const progress = useProgress();
+  const isSelected = data.enclosure_url === activeTrack?.url;
+  const duration = isSelected ? progress.duration : (data.duration ?? 0);
+  const position = isSelected ? progress.position : 0;
 
   const isInteracting = useSharedValue(false);
-  const progress = useSharedValue(0);
+  const progressShared = useSharedValue(0);
   const min = useSharedValue(0);
   const max = useSharedValue(1);
 
   useEffect(() => {
     if (!isInteracting.value && isSelected)
-      progress.value = duration > 0 ? position / duration : 0;
-  }, [duration, isInteracting, isSelected, position, progress]);
+      progressShared.value = duration > 0 ? position / duration : 0;
+  }, [duration, isInteracting, isSelected, position, progressShared]);
+
+  const download = useDownload();
+  const toggleDownload = useDownloadsStore.use.toggleDownload();
+  const isDownloaded = useDownloadsStore.use.isDownloaded()(data);
+  console.log('isDownloaded', isDownloaded);
+  function onDownload() {
+    if (!data) return;
+
+    if (isDownloaded) {
+      toggleDownload(data);
+      toast({
+        title: 'Deleted',
+      });
+      router.back();
+      return;
+    }
+
+    toast({
+      preset: 'spinner',
+      title: 'Downloading...',
+    });
+    download.mutate(
+      {
+        filename: data.title ?? 'podcast',
+        url: data.enclosure_url,
+      },
+      {
+        onSuccess: (downloadedUrl) => {
+          toggleDownload({
+            ...data,
+            enclosure_url: downloadedUrl,
+          });
+        },
+      },
+    );
+  }
 
   return (
     <BlurView
@@ -106,10 +115,23 @@ export default function PlayerModal() {
             <ArrowLeft2 size={24} color={color} />
           </PressableScale>
         }
+        endContent={
+          <PressableScale
+            className="absolute right-3 top-5 size-[24px] items-center justify-center "
+            hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+            onPress={onDownload}
+          >
+            {isDownloaded ? (
+              <Ionicons name="checkmark" size={24} color={color} />
+            ) : (
+              <Ionicons name="download-outline" size={24} color={color} />
+            )}
+          </PressableScale>
+        }
       />
       <Image
-        source={computedData.image}
-        sharedTransitionTag={computedData.image}
+        source={data?.image_url}
+        sharedTransitionTag={data?.image_url}
         className="aspect-square w-full self-center rounded-lg"
         contentFit="contain"
       />
@@ -119,7 +141,7 @@ export default function PlayerModal() {
             className="mt-2.5 text-center text-sm font-semibold"
             style={{ color }}
           >
-            {computedData.title}
+            {data.title}
           </Text>
           <Text className="text-center text-sm" style={{ color }}>
             React Native Radio
@@ -129,15 +151,15 @@ export default function PlayerModal() {
         <View className="gap-6">
           <View className="flex-row justify-between">
             <Text className="text-xs font-semibold" style={{ color }}>
-              {formatDuration(computedData.position)}
+              {formatDuration(position)}
             </Text>
             <Text className="text-xs font-semibold" style={{ color }}>
-              {formatDuration(computedData.duration)}
+              {formatDuration(duration)}
             </Text>
           </View>
           <Slider
             disable={!isSelected}
-            progress={progress}
+            progress={progressShared}
             minimumValue={min}
             maximumValue={max}
             sliderHeight={48}

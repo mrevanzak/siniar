@@ -12,7 +12,6 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown: false,
         animation: 'shift',
         tabBarActiveTintColor: colors.white,
         tabBarInactiveTintColor: colors.gray,
@@ -36,13 +35,13 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
+          headerShown: false,
           tabBarIcon: ({ color }) => <Home color={color} variant="Bold" />,
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          headerShown: true,
           headerTitle: 'Explore New Podcasts',
           tabBarIcon: ({ color }) => <Category color={color} />,
         }}
@@ -51,13 +50,13 @@ export default function TabLayout() {
         name="favorites"
         options={{
           title: 'Favorites',
-          headerShown: true,
           tabBarIcon: ({ color }) => <Heart color={color} />,
         }}
       />
       <Tabs.Screen
         name="downloads"
         options={{
+          title: 'Downloads',
           tabBarIcon: ({ color }) => (
             <Feather size={24} name="download" color={color} />
           ),

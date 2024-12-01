@@ -22,7 +22,7 @@ async function setupPlayer() {
   });
 
   await TrackPlayer.setVolume(1);
-  await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+  await TrackPlayer.setRepeatMode(RepeatMode.Off);
 }
 
 export const useSetupPlayer = ({ onLoad }: { onLoad?: () => void }) => {

@@ -33,7 +33,9 @@ export function PodcastItem({
       <Link
         href={{
           pathname: '/player',
-          params: { podcast: JSON.stringify(item) },
+          params: {
+            podcast: JSON.stringify(item),
+          },
         }}
         asChild
       >
