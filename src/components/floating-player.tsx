@@ -9,7 +9,8 @@ import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
 import { getFeaturedPodcastQuery } from '@/api/podcasts/use-featured-podcast';
 
 import { PlayButton } from './play-button';
-import { Image, Text, TouchableOpacity, View } from './ui';
+import { Image, TouchableOpacity, View } from './ui';
+import { MovingText } from './ui/moving-text';
 
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
@@ -64,13 +65,12 @@ export function FloatingPlayer() {
                 className="size-10 rounded-lg"
                 contentFit="contain"
               />
-              <Text
-                className="flex-1 text-sm"
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {activeTrack.title}
-              </Text>
+              <View className="flex-1 overflow-hidden">
+                <MovingText
+                  text={activeTrack.title ?? ''}
+                  animationThreshold={30}
+                />
+              </View>
               <PlayButton className="" />
             </View>
           </View>
