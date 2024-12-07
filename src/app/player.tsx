@@ -14,15 +14,17 @@ import {
 import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
 import { Slider } from 'react-native-awesome-slider';
-import Animated, { useSharedValue } from 'react-native-reanimated';
+import Animated, { FadeIn, useSharedValue } from 'react-native-reanimated';
 import TrackPlayer, {
   useActiveTrack,
   useProgress,
 } from 'react-native-track-player';
+import { match } from 'ts-pattern';
 
 import type { Podcast } from '@/api/podcasts/schema';
 import { PlayButton } from '@/components/play-button';
 import {
+  ActivityIndicator,
   colors,
   Image,
   ModalHeader,
@@ -46,7 +48,8 @@ export default function PlayerModal() {
 
   const activeTrack = useActiveTrack();
   const progress = useProgress();
-  const isSelected = data.enclosure_url === activeTrack?.url;
+  const isSelected =
+    new URL(data.enclosure_url).toString() === activeTrack?.url;
   const duration = isSelected ? progress.duration : (data.duration ?? 0);
   const position = isSelected ? progress.position : 0;
 
@@ -63,7 +66,6 @@ export default function PlayerModal() {
   const download = useDownload();
   const toggleDownload = useDownloadsStore.use.toggleDownload();
   const isDownloaded = useDownloadsStore.use.isDownloaded()(data);
-  console.log('isDownloaded', isDownloaded);
   function onDownload() {
     if (!data) return;
 
@@ -72,7 +74,8 @@ export default function PlayerModal() {
       toast({
         title: 'Deleted',
       });
-      router.back();
+
+      if (data.enclosure_url.includes('file://')) router.back();
       return;
     }
 
@@ -121,11 +124,22 @@ export default function PlayerModal() {
             hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
             onPress={onDownload}
           >
-            {isDownloaded ? (
-              <Ionicons name="checkmark" size={24} color={color} />
-            ) : (
-              <Ionicons name="download-outline" size={24} color={color} />
-            )}
+            {match(isDownloaded)
+              .with(true, () => (
+                <Animated.View entering={FadeIn} exiting={FadeIn}>
+                  <Ionicons name="checkmark" size={24} color={color} />
+                </Animated.View>
+              ))
+              .when(
+                () => download.isPending,
+                () => <ActivityIndicator size="small" color={color} />,
+              )
+              .with(false, () => (
+                <Animated.View entering={FadeIn} exiting={FadeIn}>
+                  <Ionicons name="download" size={24} color={color} />
+                </Animated.View>
+              ))
+              .exhaustive()}
           </PressableScale>
         }
       />
