@@ -13,8 +13,9 @@ import {
 } from 'iconsax-react-native';
 import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
 import { Slider } from 'react-native-awesome-slider';
-import Animated, { FadeIn, useSharedValue } from 'react-native-reanimated';
+import Animated, { useSharedValue } from 'react-native-reanimated';
 import TrackPlayer, {
   useActiveTrack,
   useProgress,
@@ -29,6 +30,7 @@ import {
   Image,
   ModalHeader,
   PressableScale,
+  SheetScreen,
   Text,
   View,
 } from '@/components/ui';
@@ -100,10 +102,18 @@ export default function PlayerModal() {
   }
 
   return (
-    <BlurView
-      className="py-safe flex-1 px-4"
-      experimentalBlurMethod="dimezisBlurView"
-      tint="systemChromeMaterialDark"
+    <SheetScreen
+      customBackground={
+        <BlurView
+          experimentalBlurMethod="dimezisBlurView"
+          tint="systemChromeMaterialDark"
+          style={StyleSheet.absoluteFill}
+        />
+      }
+      // @ts-expect-error just type error because of cssInterop
+      className="py-safe px-4"
+      onClose={() => router.back()}
+      opacityOnGestureMove
     >
       <ModalHeader
         title="Now Playing"
@@ -120,24 +130,19 @@ export default function PlayerModal() {
         }
         endContent={
           <PressableScale
-            className="absolute right-3 top-5 size-[24px] items-center justify-center "
-            hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+            className="absolute right-3 top-5 size-[24px]"
             onPress={onDownload}
           >
             {match(isDownloaded)
               .with(true, () => (
-                <Animated.View entering={FadeIn} exiting={FadeIn}>
-                  <Ionicons name="checkmark" size={24} color={color} />
-                </Animated.View>
+                <Ionicons name="checkmark" size={24} color={color} />
               ))
               .when(
                 () => download.isPending,
                 () => <ActivityIndicator size="small" color={color} />,
               )
               .with(false, () => (
-                <Animated.View entering={FadeIn} exiting={FadeIn}>
-                  <Ionicons name="download" size={24} color={color} />
-                </Animated.View>
+                <Ionicons name="download" size={24} color={color} />
               ))
               .exhaustive()}
           </PressableScale>
@@ -240,6 +245,6 @@ export default function PlayerModal() {
           </PressableScale>
         </View>
       </View>
-    </BlurView>
+    </SheetScreen>
   );
 }

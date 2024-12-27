@@ -11,6 +11,7 @@ import { StyleSheet } from 'react-native';
 import FlashMessage from 'react-native-flash-message';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { SheetProvider } from 'react-native-sheet-transitions';
 import TrackPlayer from 'react-native-track-player';
 
 import { APIProvider } from '@/api';
@@ -74,9 +75,11 @@ function Providers({ children }: { children: ReactNode }) {
         <ThemeProvider value={theme}>
           <APIProvider>
             <BottomSheetModalProvider>
-              <FocusAwareStatusBar />
-              {children}
-              <FlashMessage position="top" />
+              <SheetProvider>
+                <FocusAwareStatusBar />
+                {children}
+                <FlashMessage position="top" />
+              </SheetProvider>
             </BottomSheetModalProvider>
           </APIProvider>
         </ThemeProvider>

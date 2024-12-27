@@ -1,4 +1,5 @@
 import { cssInterop } from 'nativewind';
+import { SheetScreen } from 'react-native-sheet-transitions';
 import Svg from 'react-native-svg';
 
 export * from './button';
@@ -25,6 +26,7 @@ export {
   View,
 } from 'react-native';
 export { SafeAreaView } from 'react-native-safe-area-context';
+export { SheetScreen } from 'react-native-sheet-transitions';
 
 //Apply cssInterop to Svg to resolve className string into style
 cssInterop(Svg, {
@@ -32,3 +34,15 @@ cssInterop(Svg, {
     target: 'style',
   },
 });
+
+cssInterop(SheetScreen, {
+  className: {
+    target: 'style',
+  },
+});
+
+declare module 'react-native-sheet-transitions' {
+  interface Props {
+    className?: string;
+  }
+}
