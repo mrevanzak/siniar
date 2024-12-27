@@ -19,6 +19,7 @@ type Props = {
   iconProps?: IconProps;
 } & TouchableOpacityProps;
 
+// eslint-disable-next-line max-lines-per-function
 export function PlayButton({
   size = 32,
   selectedItem,
@@ -38,7 +39,7 @@ export function PlayButton({
   const isLoading = state === State.Buffering || state === State.Loading;
   const isDiff = activeTrack?.enclosure_url !== selectedItem?.enclosure_url;
 
-  function onPlay() {
+  async function onPlay() {
     if (isPlaying) return TrackPlayer.pause();
     if (isDiff && selectedItem) {
       TrackPlayer.setQueue([
@@ -50,6 +51,16 @@ export function PlayButton({
         },
       ]);
       setActiveTrack(selectedItem);
+    }
+    if ((await TrackPlayer.getQueue()).length === 0 && activeTrack) {
+      TrackPlayer.setQueue([
+        {
+          url: activeTrack.enclosure_url,
+          title: activeTrack.title,
+          artist: 'React Native Radio',
+          artwork: activeTrack.image_url,
+        },
+      ]);
     }
     TrackPlayer.play();
   }
