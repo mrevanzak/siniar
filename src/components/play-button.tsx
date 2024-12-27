@@ -3,12 +3,12 @@ import { useColorScheme } from 'nativewind';
 import type { TouchableOpacityProps } from 'react-native';
 import TrackPlayer, {
   State,
-  useActiveTrack,
   usePlaybackState,
 } from 'react-native-track-player';
 import { match,P } from 'ts-pattern';
 
 import type { Podcast } from '@/api/podcasts/schema';
+import { usePlayerStore } from '@/lib/stores/player';
 
 import { ActivityIndicator, colors,PressableScale } from './ui';
 
@@ -31,15 +31,16 @@ export function PlayButton({
     colorScheme === 'dark' ? colors.gray : colors['dark-gray'];
 
   const { state } = usePlaybackState();
-  const activeTrack = useActiveTrack();
+  const activeTrack = usePlayerStore((state) => state.active);
+  const setActiveTrack = usePlayerStore((state) => state.setActive);
+
   const isPlaying = rest.isPlaying ?? state === State.Playing;
   const isLoading = state === State.Buffering || state === State.Loading;
+  const isDiff = activeTrack?.enclosure_url !== selectedItem?.enclosure_url;
 
   function onPlay() {
-    const isDiff = activeTrack?.url !== selectedItem?.enclosure_url;
     if (isPlaying) return TrackPlayer.pause();
-
-    if (isDiff && selectedItem)
+    if (isDiff && selectedItem) {
       TrackPlayer.setQueue([
         {
           url: selectedItem.enclosure_url,
@@ -48,6 +49,8 @@ export function PlayButton({
           artwork: selectedItem.image_url,
         },
       ]);
+      setActiveTrack(selectedItem);
+    }
     TrackPlayer.play();
   }
 

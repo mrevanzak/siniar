@@ -9,6 +9,10 @@ type WithSelectors<S> = S extends { getState: () => infer T }
   ? S & { use: { [K in keyof T]: () => T[K] } }
   : never;
 
+export type ActionState<T> = {
+  [K in keyof T as `set${Capitalize<string & K>}`]: (value: T[K]) => void;
+};
+
 export const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(
   _store: S,
 ) => {

@@ -116,7 +116,7 @@ export default function PlayerModal() {
       opacityOnGestureMove
     >
       <ModalHeader
-        title="Now Playing"
+        title={isSelected ? 'Now Playing' : 'Podcast'}
         titleStyle={{ color }}
         className="my-2"
         startContent={
@@ -238,7 +238,7 @@ export default function PlayerModal() {
             <Backward10Seconds size={24} color={color} />
           </PressableScale>
           <Previous size={24} color={color} />
-          <PlayButton size={60} iconProps={{ color }} />
+          <PlayButton size={60} iconProps={{ color }} selectedItem={data} />
           <Next size={24} color={color} />
           <PressableScale onPress={() => TrackPlayer.seekBy(+10)}>
             <Forward10Seconds size={24} color={color} />

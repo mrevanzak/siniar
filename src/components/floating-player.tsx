@@ -4,9 +4,10 @@ import { Link } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
+import TrackPlayer from 'react-native-track-player';
 
 import { getFeaturedPodcastQuery } from '@/api/podcasts/use-featured-podcast';
+import { usePlayerStore } from '@/lib/stores/player';
 
 import { PlayButton } from './play-button';
 import { Image, TouchableOpacity, View } from './ui';
@@ -19,7 +20,7 @@ const AnimatedTouchableOpacity =
 export function FloatingPlayer() {
   const { colorScheme } = useColorScheme();
 
-  const activeTrack = useActiveTrack();
+  const activeTrack = usePlayerStore((state) => state.active);
 
   const featuredPodcastQuery = useQuery({
     ...getFeaturedPodcastQuery,
@@ -46,7 +47,7 @@ export function FloatingPlayer() {
     <Link
       href={{
         pathname: '/player',
-        params: { podcast: JSON.stringify(data) },
+        params: { podcast: JSON.stringify(activeTrack ?? data) },
       }}
       asChild
     >
@@ -60,8 +61,8 @@ export function FloatingPlayer() {
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-4">
               <Image
-                source={{ uri: activeTrack.artwork }}
-                sharedTransitionTag={activeTrack.artwork}
+                source={{ uri: activeTrack.image_url }}
+                sharedTransitionTag={activeTrack.image_url}
                 className="size-10 rounded-lg"
                 contentFit="contain"
               />
